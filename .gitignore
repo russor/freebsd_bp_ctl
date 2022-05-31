@@ -1,0 +1,13 @@
+*~
+.depend.*
+driver/*.o
+driver/*.ko
+driver/export_syms
+driver/opt_global.h
+driver/bus_if.h
+driver/device_if.h
+driver/machine
+driver/opt_bdg.h
+driver/pci_if.h
+util/bpctl_util
+
