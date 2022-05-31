@@ -1,0 +1,129 @@
+                 Release Notes
+       	Silicom FreeBSD Bypass Control Utility
+		Version 4.0.2
+		  09/03/2021
+v4.0.2
+-  Added support for FB 12.2
+
+v4.0.1
+- Fixed ifname addressing
+- Fixed readme.txt
+
+v4.0.0
+- Added support for FB 11
+- Added support for XL710.
+
+v3.10.5
+- Added FB 10.2 support
+
+v3.10.4
+- Added PAC1200BPi35,  PE210G2BPI40.
+- Added device ID for some 99..
+  
+v3.10.3
+- Fixed adapter names
+- Added PE2G6BPi35
+PE2G6BPFi35, 
+PE2G6BPFi35CX,
+PE310G4BPi9T, 
+PE310G4BPi9SR,
+PE310G4BPi9LR,
+PE310G4BPi9T, 
+PE310G4BPi9SR,
+PE310G4BPi9LR,
+PE2G2BPFi35, 
+PE2G2BPFi35LX,
+PE2G2BPFi35ZX,
+PE2G4BPFi35,
+PE2G4BPFi35LX,
+PE2G4BPFi35ZX,
+PE2G2BPi35,
+PE2G4BPi35L,
+PE2G4BPi35,
+M6E2G8BPi80A, 
+PE210G2DBi9SR,  
+PE210G2DBi9SRRB,
+PE210G2DBi9LR,  
+PE210G2DBi9LRRB,
+PE310G4DBi940SR,
+M6E2G8BPi80
+- Added support for PE2G2BPi80-series adapters.
+- Fixed TX_CTL for i80.
+- Added support for hw TX_CTL (copper i80).
+- Fixed get_status for i80 series. 
+
+v3.0.9
+- Fixed interface for 82599.
+                  
+v3.0.8                  
+- Added support for M1E2G4BPi80.
+- Added support for PEG2BPFI6FLXM.
+- Added support for user-space driver (controlling via 
+bus, function, device).
+- Added support for following adapters:
+    M1E10G2BPI9CX4, M1E10G2BPI9SR, M1E10G2BPI9LR, M1E10G2BPI9T,
+    PE210G2BPI9CX4,PE210G2BPI9SR,PE210G2BPI9LR,PE210G2BPI9T,
+    M2EG2BPFI6,M2EG2BPFI6LX,M2EG2BPFI6ZX,M2EG4BPI6,M2EG4BPFI6,
+    M2EG4BPFI6LX,M2EG4BPFI6ZX,M2EG6BPI6,PEG2DBI6,PEG2DBFI6,  
+    PEG2DBFI6LX, PEG2DBFI6ZX,MEG2BPI6,   XEG2BPI6,M1EG2BPi6-SD, 
+    M1EG2BPFi6-SD, M1EG2BPFi6-LX-SD, M1EG2BPFi6-ZX-SD, 
+    M1EG4BPi6-SD, M1EG4BPFi6-SD, M1EG4BPFi6-LX-SD,M1EG4BPFi6-ZX-SD,
+    M1E2G6BPi6-SD.
+- Added support for 82599 Bypass..
+- Changes in HW handling for 82575/6 fiber.
+
+v3.0.7.2
+- Added support for 7.2stable.
+
+v3.0.7.1
+- Added support for PCI_ANY_ID.
+
+v3.0.7
+- Added support for PEG4BPFI6, PEG4BPFI6LX,  
+  PEG4BPFI6ZX, PEG2BPI6, PEG2BPFI6, PEG2BPFI6LX, PEG2BPFI6ZX,
+  PEG4BPI6FC, PEG4BPFI6FC, PEG4BPFI6FCLX, PEG4BPFI6FCZX,
+  PEG6BPI6, PEG2BPI6SC6, MEG2BPI6, XEG2BPI6, MEG4BPI6,
+  PEG4BPI6, PE10G2BPTLR, PE10G2BPTSR, PE10G2BPTCX4,
+  PEG6BPIFC.
+  
+- PEG6BPI changed to PEG6BPI5.
+- PE10GDBISR changed to PE10G2DBISR.
+- PEG2BPID changed to PEG2BPI5.
+
+v3.0.6.6
+- Added recognizing of "BCM driver unloaded"/"interface down" events for 57710.
+
+v3.0.6.5
+- Added support for PE10G2BPTSR, PE10G2BPTLR.
+
+v3.0.6.4
+- Added support for PE10G2BPTCX4.
+
+v3.0.6.3
+- Warnings fixing.
+
+v3.0.6.2
+- Added support for FB7, 0xa8 pic fw version, 10g adapters.
+
+v3.0.5		  
+- Added support for PXG2BISC1, PMCX4BPIN, PMCX2BPIN, PXG4BPFILX adapters.
+- Fixed PMC adapters output product name.
+  
+v3.0.4
+- Added support for BP_PWOFF_CTL_CAP (A7) .
+- Adapters names were changed (from PEG4BPI to PEXG4BPI, from PEG4BPIN to PEG4BPI).
+
+v3.0.3
+- Fixed SET/GET_TX command for PXG2BPFI.
+
+		  
+v3.0.1
+- Added support for FreeBSD 4.x
+- Added support for PMCXG2BPFI, PMCXG2BPFIN.
+- Fixed set_wd_autoreset command (bpctl_util).
+- Fixed usage print (bpctl_util).
+		   
+v3.0.0
+- First release of the utility.  Supported adapters: PXG2BPFI, PXG2BPFIL, PXG2BPFILX, 
+  PXG2BPFILLX, PXG2BPI, PXG2BPIG, PXG2TBFI, PXG4BPI, PXG4BPFI, PEG4BPI, PEG2BPI, PEG4BPIN,   
+  PEG2BPFI, PEG2BPFILX. Tested on FreeBSD 6.0, 5x. 
