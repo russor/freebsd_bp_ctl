@@ -3197,14 +3197,14 @@ void wd_reset_timer(void *param){
 	if ((pbpctl_dev->bp_ext_ver>=PXG2BPI_VER)&&
 		(pbpctl_dev->wdt_busy==1))
 	{
-		pbpctl_dev->bp_timer= timeout(wd_reset_timer, pbpctl_dev, 1);
+		callout_reset(&pbpctl_dev->bp_timer, 1, wd_reset_timer, pbpctl_dev);
 		return;
 	}
 
 	wdt_timer_reload(pbpctl_dev); 
 
 	if (pbpctl_dev->reset_time)
-		pbpctl_dev->bp_timer= timeout(wd_reset_timer, pbpctl_dev, (pbpctl_dev->reset_time*hz)/1000);
+		callout_reset(&pbpctl_dev->bp_timer, (pbpctl_dev->reset_time*hz)/1000, wd_reset_timer, pbpctl_dev);
 
 }
 
@@ -4431,10 +4431,11 @@ static int bypass_off_init(bpctl_dev_t *pbpctl_dev){
 
 static void remove_bypass_wd_auto(bpctl_dev_t *pbpctl_dev){
 	if (pbpctl_dev->bp_caps&WD_CTL_CAP)
-		untimeout(wd_reset_timer, pbpctl_dev, pbpctl_dev->bp_timer);
+		callout_drain(&pbpctl_dev->bp_timer);
 }
 
 static int init_bypass_wd_auto(bpctl_dev_t *pbpctl_dev){
+	callout_init(&pbpctl_dev->bp_timer, 1);
 	return 1; 
 }
 
@@ -5863,7 +5864,7 @@ static void bp_tpl_timer_fn(void *param){
 			set_tx(pbpctl_dev, 1);  
 		}
 	}
-	pbpctl_dev->bp_tpl_timer = timeout(bp_tpl_timer_fn, pbpctl_dev, BP_LINK_MON_DELAY*hz);
+	callout_reset(&pbpctl_dev->bp_tpl_timer, BP_LINK_MON_DELAY*hz, bp_tpl_timer_fn, pbpctl_dev);
 }
 
 
@@ -5873,7 +5874,7 @@ static void remove_bypass_tpl_auto(bpctl_dev_t *pbpctl_dev) {
 	pbpctl_dev_b = get_status_port_fn(pbpctl_dev);
 
 	if (pbpctl_dev->bp_caps&TPL_CAP) {
-		untimeout(bp_tpl_timer_fn, pbpctl_dev, pbpctl_dev->bp_tpl_timer);
+		callout_drain(&pbpctl_dev->bp_tpl_timer);
 		pbpctl_dev->bp_tpl_flag = 0;
 		pbpctl_dev_b=get_status_port_fn(pbpctl_dev);
 		if (pbpctl_dev_b) {
@@ -5883,21 +5884,20 @@ static void remove_bypass_tpl_auto(bpctl_dev_t *pbpctl_dev) {
 	}
 	return;    
 }
-#if 0
 static int init_bypass_tpl_auto(bpctl_dev_t *pbpctl_dev){
 	if (pbpctl_dev->bp_caps&TPL_CAP)
 	{
+		callout_init(&pbpctl_dev->bp_tpl_timer, 1);
 		return BP_OK;
 	}
 	return BP_NOT_CAP; 
 }
-#endif
 
 static int set_bypass_tpl_auto(bpctl_dev_t *pbpctl_dev, unsigned int param) {
 	if (pbpctl_dev->bp_caps&TPL_CAP) {
 		if ((param)&&(!pbpctl_dev->bp_tpl_flag)) {
 			pbpctl_dev->bp_tpl_flag=param;
-			pbpctl_dev->bp_tpl_timer= timeout(bp_tpl_timer_fn, pbpctl_dev, 1);
+			callout_reset(&pbpctl_dev->bp_tpl_timer, 1, bp_tpl_timer_fn, pbpctl_dev);
 			return BP_OK;
 		};
 		if ((!param)&&(pbpctl_dev->bp_tpl_flag)) {
@@ -7919,6 +7919,7 @@ bpmod_alloc_devices(void)
 
 						bypass_caps_init(&bpctl_dev_arr[idx_dev]);
 						init_bypass_wd_auto(&bpctl_dev_arr[idx_dev]);
+						init_bypass_tpl_auto(&bpctl_dev_arr[idx_dev]);
 					} /*!bpctl_dev_arr[idx_dev].bp_10g9*/
 					if (device_get_nameunit(*childp)!=NULL)
 					{
@@ -7976,6 +7977,7 @@ bpmod_alloc_devices(void)
 			bypass_caps_init(&bpctl_dev_arr[idx_dev]);
 
 			init_bypass_wd_auto(&bpctl_dev_arr[idx_dev]);
+			init_bypass_tpl_auto(&bpctl_dev_arr[idx_dev]);
 
 		}
 

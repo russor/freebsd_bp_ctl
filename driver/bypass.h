@@ -271,7 +271,7 @@ typedef struct _bpctl_dev {
     int wdt_status;
     unsigned long bypass_wdt_on_time;
     u_int32_t bypass_timer_interval;
-    struct callout_handle bp_timer;
+    struct callout bp_timer;
     u_int32_t reset_time;
     int      wdt_busy;
     uint8_t   bp_status_un;
@@ -282,7 +282,7 @@ typedef struct _bpctl_dev {
     int   bp_i80; 
     int   bp_540;
 	int   bp_40g;
-    struct callout_handle bp_tpl_timer;
+    struct callout bp_tpl_timer;
     int   bp_tpl_flag;
     bp_media_type media_type;
 
