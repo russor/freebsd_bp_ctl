@@ -1,3 +1,28 @@
+Notes from russor:
+
+I've downloaded this driver from from https://www.silicom-usa.com/drivercat/bypass-1/
+on May 31, 2022, Version 4.0.2 09/03/2021 (zip file on ftp dated Oct 19, 2021)
+
+And changed it to update the timeout/untimeout calls to callout(9) as
+timeout was removed from FreeBSD 13.0 and later.
+
+As a side-note, if you've got a PEG4BPI or similar, older card that shows up
+with vendor=0x1374 device=0x0038 (or similar); it might be possible to
+adjust the eeprom to show up with Intel vendor and device ids, and then
+it'll be much easier to use.  The simplest way I found to do that is not
+super simple, but install the card in a system that can do IO-MMU based PCI
+passthrough to a VM; run a Linux vm, with the NIC(s) passed through with the
+expected Intel vendor and device id, and then you should be able to use
+ethtool to adjust the EEPROM. For my PEG4BPI, the desired vendor is 0x8086,
+device 0x105E, and Initialization Control Word 1 (Word 0Ah) needed to be
+adjusted, ethtool shows that word as offset 0x14 (low byte) and 0x15 (high
+byte); bit zero of the low byte controls whether the device uses the default
+vendor and device IDs or the values in the EEPROM; setting that to zero uses
+the default values; the device then shows up as a PEG4BPI-SD and you no
+longer need to modify this bpmod driver, or the em driver to detect it.
+
+Original content from Silicom below:
+
     	Silicom FreeBSD Bypass Control Utility
 		  
 1. Compiling, installing and loading the software.
