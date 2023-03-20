@@ -226,11 +226,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define WDT_STATUS_DIS 0
 
 struct softc_ex {
-#if __FreeBSD_version < 600000
-    struct arpcom   interface_data;
-#else
     struct ifnet   *ifp;
-#endif
 };
 
 struct bpctl_osdep {

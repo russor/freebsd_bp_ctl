@@ -51,14 +51,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <machine/clock.h>
 
 
-#if __FreeBSD_version >= 502000
-	#include <dev/pci/pcivar.h> /* For get_pci macros! */
-
-	#include <dev/pci/pcireg.h>
-#else
-	#include <pci/pcivar.h>
-	#include <pci/pcireg.h>
-#endif
+#include <dev/pci/pcivar.h> /* For get_pci macros! */
+#include <dev/pci/pcireg.h>
 
 
 
@@ -82,15 +76,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #define BP_MOD_VER  "4.0.2"
 #define BP_MOD_DESCR "Silicom Bypass Control driver"
 
-#if  __FreeBSD_version < 600000
-static dev_t bpmod_dev;
-#else
 struct cdev *bpmod_dev;
-#endif
 
-#if __FreeBSD_version>=500000    
 struct mtx  mtx;
-#endif
 
 
 /*static int major_num=0;*/
@@ -6320,33 +6308,17 @@ static int set_bp_manuf_fn(bpctl_dev_t *pbpctl_dev) {
 }
 
 
-#if __FreeBSD_version < 500000
-static int
-bpmod_open(dev_t dev, int flag, int otyp, struct proc *procp)
-{
-	return(0);
-}
-#else
 static int
 bpmod_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 {
 	return(0);
 }
-#endif
 
-#if __FreeBSD_version < 500000
-static int
-bpmod_close(dev_t dev, int flag, int otyp, struct proc *procp)
-{
-	return(0);
-}
-#else
 static int
 bpmod_close(struct cdev *dev, int flag, int otyp, struct thread *td)
 {
 	return(0);
 }
-#endif
 
 
 static int get_dev_idx_bsf(int bus, int slot, int func) {
@@ -6363,26 +6335,17 @@ static int get_dev_idx_bsf(int bus, int slot, int func) {
 }
 
 
-#if __FreeBSD_version < 500000
-static int
-bpmod_ioctl(dev_t dev, u_long cmd, caddr_t arg, int mode, struct proc *procp)
-{
-#else
 static   int
 bpmod_ioctl(struct cdev *dev, u_long cmd, caddr_t arg, int mode,
 			struct thread *td)
 {
 
-#endif
 
 	struct bpctl_cmd *bpctl_cmd;
 	int dev_idx = 0;
 	bpctl_dev_t *pbpctl_dev_out = 0;
 	bpctl_dev_t *pbpctl_dev = 0;
 
-#if __FreeBSD_version < 500000
-	int s;
-#endif
 
 	bpctl_cmd = (struct bpctl_cmd *)arg;
 	if (bpctl_cmd == NULL) {
@@ -6403,11 +6366,7 @@ bpmod_ioctl(struct cdev *dev, u_long cmd, caddr_t arg, int mode,
 	}
 
 
-#if __FreeBSD_version<500000
-	s = splimp();
-#else
 	mtx_lock(&mtx);
-#endif
 	if ((bpctl_cmd->in_param[5])||
 		(bpctl_cmd->in_param[6])||
 		(bpctl_cmd->in_param[7])) {
@@ -6418,12 +6377,7 @@ bpmod_ioctl(struct cdev *dev, u_long cmd, caddr_t arg, int mode,
 		dev_idx = (bpctl_cmd->in_param[1] == 0)?bpctl_cmd->in_param[0]:get_dev_idx(bpctl_cmd->in_param[1]);
 	}
 	if (dev_idx<0||dev_idx>device_num) {
-
-#if __FreeBSD_version<500000    
-		splx(s);
-#else 
 		mtx_unlock(&mtx);
-#endif          
 		return -EOPNOTSUPP;
 	}
 
@@ -6667,56 +6621,24 @@ bpmod_ioctl(struct cdev *dev, u_long cmd, caddr_t arg, int mode,
 		break;
 
 	default:
-#if __FreeBSD_version<500000        
-		splx(s);
-#else 
 		mtx_unlock(&mtx);
-#endif  
 		return -EOPNOTSUPP;
 	}
 
 
 	exit_ioctl:
-#if __FreeBSD_version<500000        
-	splx(s);
-#else 
 	mtx_unlock(&mtx);
-#endif
 	return SUCCESS;
 }
 
-#if __FreeBSD_version < 500000 
-
-
-static struct cdevsw bpmod_devsw = {
-	bpmod_open,
-	bpmod_close,
-	noread,
-	nowrite,
-	bpmod_ioctl,
-	nopoll,
-	nommap,
-	nostrategy,
-	"bpmod",
-	MAJOR_NUM,
-	nodump,
-	nopsize,
-	D_TTY,
-	-1
-};
-#else
 static struct cdevsw bpmod_devsw = {
 	  .d_version = D_VERSION,
 		.d_open = bpmod_open,
 		.d_close = bpmod_close,
 		.d_ioctl = bpmod_ioctl,
 		.d_name = "bpmod",
-#if  __FreeBSD_version < 600000
-	   .d_maj = MAJOR_NUM
-#endif
 }; 
 
-#endif 
 
 
 #ifndef PCI_DEVICE
@@ -7619,9 +7541,7 @@ static int bpmod_init(void)
 {   
 	printf(BP_MOD_DESCR" v"BP_MOD_VER"\n");
 
-#if __FreeBSD_version>=500000    
 	mtx_init(&mtx, "bpmod", MTX_NETWORK_LOCK, MTX_DEF);
-#endif 
 
 	device_num=bpmod_find_devices();
 
@@ -7665,9 +7585,7 @@ static void bpmod_clean(void)
 	if (bpctl_dev_arr)
 
 		free (bpctl_dev_arr, M_DEVBUF);
-#if __FreeBSD_version>=500000    	
 	mtx_destroy(&mtx); 
-#endif
 }
 
 static int
@@ -7884,10 +7802,8 @@ bpmod_alloc_devices(void)
 									child= *childp;                                                                    
 									rid = EM_MMBA;                                                                     
 
-#if __FreeBSD_version>=500000                                                                                  
 									bpctl_dev_arr[idx_dev].res_memory = bus_alloc_resource_any(*childp, SYS_RES_MEMORY,
 																							   &rid, RF_ACTIVE);               
-#endif /* FREEBSD_REL_4 */                                                                                     
 									if (!(bpctl_dev_arr[idx_dev].res_memory))
 									{                                                                                  
 										printf("Unable to allocate bus resource: memory\n" );                          
