@@ -107,19 +107,6 @@ static bpctl_dev_t *bpctl_dev_arr;
 
 int device_num;
 
-static void if_scan(void){
-	int idx_dev=0;
-	struct ifnet *ifp=NULL;
-	/* rtnl_lock();*/
-	for (idx_dev = 0; ((bpctl_dev_arr[idx_dev].pdev!=NULL)&&(idx_dev<device_num)); idx_dev++)
-	{
-		ifp = ifunit(bpctl_dev_arr[idx_dev].nameunit);
-		if (ifp) {
-			bpctl_dev_arr[idx_dev].ndev=ifp;
-			bpctl_dev_arr[idx_dev].ifindex=ifp->if_index;
-		}
-	} 
-}
 static bpctl_dev_t *get_status_port_fn(bpctl_dev_t *pbpctl_dev);
 static int get_bypass_caps_fn(bpctl_dev_t *pbpctl_dev);
 
@@ -6236,7 +6223,6 @@ static int get_bypass_info_fn(bpctl_dev_t *pbpctl_dev, char *dev_name, char *add
 static int get_dev_idx(int ifindex) {
 	int idx_dev=0;
 
-	if_scan();
 	for (idx_dev = 0; ((bpctl_dev_arr[idx_dev].pdev != NULL) && (idx_dev<device_num)); idx_dev++)
 	{
 		if (ifindex == bpctl_dev_arr[idx_dev].ifindex)
@@ -6323,7 +6309,6 @@ bpmod_close(struct cdev *dev, int flag, int otyp, struct thread *td)
 
 static int get_dev_idx_bsf(int bus, int slot, int func) {
 	int idx_dev=0;
-	if_scan();
 	for (idx_dev = 0; ((bpctl_dev_arr[idx_dev].pdev!=NULL)&&(idx_dev<device_num)); idx_dev++) {
 		if ((bus==bpctl_dev_arr[idx_dev].bus) &&
 			(slot==bpctl_dev_arr[idx_dev].slot) &&
@@ -6357,7 +6342,6 @@ bpmod_ioctl(struct cdev *dev, u_long cmd, caddr_t arg, int mode,
 * Switch according to the ioctl called
 */
 	if (cmd == IOCTL_TX_MSG(IF_SCAN)) {    
-		if_scan();
 		return SUCCESS;
 	}
 	if (cmd == IOCTL_TX_MSG(GET_DEV_NUM)) {    
@@ -6395,7 +6379,6 @@ bpmod_ioctl(struct cdev *dev, u_long cmd, caddr_t arg, int mode,
 			bpctl_cmd->status=-1;
 			goto exit_ioctl;
 		}
-		if_scan();
 		if (bpctl_dev_arr[dev_idx].ndev) {
 			if (!(bpctl_dev_arr[dev_idx].ndev->if_flags & IFF_UP)) {
 				printf("Please bring up network interfaces for %s adapter!\n",
@@ -7578,6 +7561,9 @@ static void bpmod_clean(void)
 		iounmap ((void *)(bpctl_dev_arr[i].mem_map));
 #endif
 		remove_bypass_tpl_auto(&bpctl_dev_arr[i]);
+		if (bpctl_dev_arr[i].ndev) {
+			if_rele(bpctl_dev_arr[i].ndev);
+		}
 
 	}
 
@@ -7763,7 +7749,6 @@ bpmod_alloc_devices(void)
 					}
 
 					if (BP10GB_IF_SERIES(bpctl_dev_arr[idx_dev].subdevice)) {
-						if_scan();
 						if (bpctl_dev_arr[idx_dev].ifindex==0) {
 							printf("Please load network driver for %s adapter!\n",bpctl_dev_arr[idx_dev].name);
 							free(pci_devices, M_TEMP);
@@ -7843,7 +7828,7 @@ bpmod_alloc_devices(void)
 						struct ifnet *ifp=NULL;
 
 						snprintf(bpctl_dev_arr[idx_dev].nameunit, IFNAMSIZ, "%s", device_get_nameunit(*childp));
-						ifp = ifunit(bpctl_dev_arr[idx_dev].nameunit);
+						ifp = ifunit_ref(bpctl_dev_arr[idx_dev].nameunit);
 						if (ifp) {
 							bpctl_dev_arr[idx_dev].ndev=ifp;
 							bpctl_dev_arr[idx_dev].ifindex=ifp->if_index;
