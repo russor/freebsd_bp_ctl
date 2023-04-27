@@ -4,7 +4,11 @@ I've downloaded this driver from from https://www.silicom-usa.com/drivercat/bypa
 on May 31, 2022, Version 4.0.2 09/03/2021 (zip file on ftp dated Oct 19, 2021)
 
 And changed it to update the timeout/untimeout calls to callout(9) as
-timeout was removed from FreeBSD 13.0 and later.
+timeout was removed from FreeBSD 13.0 and later. Interface scanning on each
+ioctl was removed; it was panicing on my hosts, so I switched the load time
+interface scanning to use ifunit_ref, added in FreeBSD 8, which I think may
+better handle the reasoning behind if_scan? Additionally, ifdefs allowing
+compilation on kernels earlier than FreeBSD 6 was removed.
 
 As a side-note, if you've got a PEG4BPI or similar, older card that shows up
 with vendor=0x1374, and not just the subvendor set; it might be possible to
