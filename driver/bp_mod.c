@@ -1470,20 +1470,16 @@ static int wdt_pulse(bpctl_dev_t *pbpctl_dev){
 
 		/* DATA 0 CLK 1 */
 		if (pbpctl_dev->func == 0) {
-			unsigned char a;
-
 			BPCTLI_WRITE_OFFSET(pbpctl_dev_c, 0x88184, 0x62);
 			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
-			a = BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
+			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 			/* if(!(a & BIT_2))
 					printk("!!SDP2 stuck low! 0x%x %x\n", a, BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT));*/
 		} else {
-			unsigned char a;
-
 			BPCTLI_WRITE_OFFSET(pbpctl_dev_c, 0x88184, 0x63);
 			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 
-			a = BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
+			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 			/*if(!(a & BIT_3))
 					printk("SDP3 stuck low! 0x%x %x\n", a, BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT));*/
 
@@ -1541,20 +1537,16 @@ static int wdt_pulse(bpctl_dev_t *pbpctl_dev){
 
 		/* DATA 0 CLK 0 */
 		if (pbpctl_dev->func == 0) {
-			unsigned char a;
-
 			BPCTLI_WRITE_OFFSET(pbpctl_dev_c, 0x88184, 0x42);
 			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
-			a = BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
+			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 			/*if(a & BIT_2)
 				printk("SDP2 stuck high! 0x%x %x\n", a, BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT));*/
 
 		} else {
-			unsigned char a;
-
 			BPCTLI_WRITE_OFFSET(pbpctl_dev_c, 0x88184, 0x43);
 			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
-			a = BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
+			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 			/*if(a & BIT_3)
 				printk("SDP3 stuck high! 0x%x %x\n", a, BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT));*/
 
@@ -1617,21 +1609,17 @@ static int wdt_pulse(bpctl_dev_t *pbpctl_dev){
 	if (pbpctl_dev->bp_40g) {
 		/* DATA 0 CLK 1 */
 		if (pbpctl_dev->func == 0) {
-			unsigned char a;
-
 			BPCTLI_WRITE_OFFSET(pbpctl_dev_c, 0x88184, 0x62);
 			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
-			a = BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
+			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 
 			/*if(! ( a & BIT_2))
 				 printk("!!!SDP2 stuck low! 0x%x %x\n", a, BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT));*/
 
 		} else {
-			unsigned char a;
-
 			BPCTLI_WRITE_OFFSET(pbpctl_dev_c, 0x88184, 0x63);
 			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
-			a = BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
+			BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT);
 
 			/* if(! ( a & BIT_3))
 				   printk("SDP3 stuck low! 0x%x %x\n", a, BP40G_RD_REG(pbpctl_dev_c, GPIO_STAT));*/
@@ -3141,8 +3129,6 @@ static int wdt_timer(bpctl_dev_t *pbpctl_dev, int *time_left){
 
 static int wdt_timer_reload(bpctl_dev_t *pbpctl_dev){
 
-	int ret=0;
-
 	if (pbpctl_dev->bp_40g) {
 		if (pbpctl_dev->bp_caps&WD_CTL_CAP) {
 			wdt_pulse(pbpctl_dev);
@@ -3153,10 +3139,10 @@ static int wdt_timer_reload(bpctl_dev_t *pbpctl_dev){
 	if ((pbpctl_dev->bp_caps&WD_CTL_CAP)&&
 		(pbpctl_dev->wdt_status!=WDT_STATUS_UNKNOWN)) {
 		if (pbpctl_dev->bp_ext_ver>=PXG2BPI_VER)
-			ret= wdt_pulse(pbpctl_dev);
+			wdt_pulse(pbpctl_dev);
 		else if (INTEL_IF_SERIES(pbpctl_dev->subdevice))
-			ret=wdt_pulse_int(pbpctl_dev);
-		else  ret=send_wdt_pulse(pbpctl_dev);
+			wdt_pulse_int(pbpctl_dev);
+		else send_wdt_pulse(pbpctl_dev);
 		//if (ret==-1)
 		//    mod_timer(&pbpctl_dev->bp_timer, jiffies+1);
 		return 1;
